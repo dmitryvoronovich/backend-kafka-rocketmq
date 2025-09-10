@@ -2,12 +2,19 @@
 The `backend-kafka-rocketmq` repository contains the following modules:
 
 - **db-mgmt** – Manages database schema creation and updates using Liquibase.
-- **domain-common** – Contains shared entities, models, and data structures.
+- **domain-common** – Contains shared entities and models
 - **event-producer-service** – Exposes REST endpoint and produces messages to Kafka.
 - **event-matcher-service** – Consumes messages from Kafka, matches them with the bets in database, and produces messages for bets that need to be settled.
 - **settlement-consumer** – Consumes bet-settlement messages and logs the results.
 
 ## Quick Start
+
+### Build Project
+- NOTE: port is default 8080, might need to change if already used on local machine
+  if required change the server.port in event-producer-service [application.properties](./event-producer-service/src/main/resources/application.properties)
+```
+./gradlew clean build
+```
 
 ### Run Docker Containers
 ```
@@ -33,6 +40,10 @@ sh mqadmin updatetopic -t bet-settlements -c DefaultCluster
 ```
 sh mqadmin topicList -n namesrv:9876 | grep bet-settlements
 ```
+#### Exit Docker Container
+```
+exit;
+```
 
 ### Run Services
 Start the services using your IDE's **run configurations**. Make sure the following run configurations are available:
@@ -56,6 +67,15 @@ java -jar settlement-consumer/build/libs/settlement-consumer-1.0-SNAPSHOT.jar
 ```
 
 ### Send EventOutcome via API
+- NOTE: port is default 8080, might need to change if already used on local machine
+  if required change the server.port in event-producer-service [application.properties](./event-producer-service/src/main/resources/application.properties)
+- default / git bash:
+```
+curl -X POST http://localhost:8080/api/events/post \
+-H "Content-Type: application/json" \
+-d '{"eventId":"E1","eventName":"Championship Final","winnerId":"W1"}'
+```
+- via WSL:
 ```
 HOST_IP=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}')
 ```
