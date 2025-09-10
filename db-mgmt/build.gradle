@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+    id 'org.liquibase.gradle' version '2.2.0'
+}
+
+group = 'org.poc'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    liquibaseRuntime 'org.liquibase:liquibase-core:4.23.1'
+    liquibaseRuntime 'org.postgresql:postgresql:42.6.0'
+    liquibaseRuntime 'info.picocli:picocli:4.7.5'
+}
+
+liquibase {
+    activities {
+        main {
+            changeLogFile 'db-mgmt/src/main/resources/db/changelog/db.changelog-master.xml'
+            url 'jdbc:postgresql://localhost:5432/mydatabase'
+            username 'myuser'
+            password 'mypassword'
+            driver 'org.postgresql.Driver'
+        }
+    }
+    runList = 'main'
+}

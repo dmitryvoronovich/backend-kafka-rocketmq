@@ -1,0 +1,117 @@
+version: "3.8"
+
+services:
+    zookeeper:
+        image: confluentinc/cp-zookeeper:7.5.1
+        container_name: zookeeper
+        restart: unless-stopped
+        ports:
+            - "2181:2181"
+        environment:
+            ZOOKEEPER_CLIENT_PORT: 2181
+
+    kafka:
+        image: confluentinc/cp-kafka:7.5.1
+        container_name: kafka
+        restart: unless-stopped
+        depends_on:
+            - zookeeper
+        ports:
+            - "9092:9092"
+            - "29092:29092"
+        environment:
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+    kafka-topic-initializer:
+        image: confluentinc/cp-enterprise-kafka:7.5.1
+        hostname: localhost
+        container_name: initializer
+        depends_on:
+            - kafka
+        command: "bash -c -a 'echo Waiting for Kafka to be ready... && \
+                       /etc/confluent/docker/configure && \
+                       cub kafka-ready -b kafka:9092 1 60 && \
+                       sleep 5 && \
+                       kafka-topics --bootstrap-server kafka:9092 --topic event-outcomes --create --replication-factor 1 --partitions 4 '"
+        environment:
+            CONNECT_BOOTSTRAP_SERVERS: ignored
+            KAFKA_ZOOKEEPER_CONNECT: ignored
+            KAFKA_ADVERTISED_LISTENERS: ignored
+
+    schema-registry:
+        image: confluentinc/cp-schema-registry:7.5.1
+        container_name: schema-registry
+        restart: unless-stopped
+        depends_on:
+            - kafka
+        ports:
+            - "8081:8081"
+        environment:
+            SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:9092
+            SCHEMA_REGISTRY_HOST_NAME: schema-registry
+            SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+
+    postgres:
+        image: postgres:15
+        container_name: my_postgres
+        restart: always
+        environment:
+          POSTGRES_USER: myuser
+          POSTGRES_PASSWORD: mypassword
+          POSTGRES_DB: mydatabase
+        ports:
+          - "5432:5432"
+        volumes:
+          - pgdata:/var/lib/postgresql/data
+
+    namesrv:
+        image: apache/rocketmq:5.3.2
+        container_name: rmqnamesrv
+        ports:
+          - 9876:9876
+        networks:
+          - rocketmq
+        command: sh mqnamesrv
+
+    broker:
+        image: apache/rocketmq:5.3.2
+        container_name: rmqbroker
+        ports:
+          - 10909:10909
+          - 10911:10911
+          - 10912:10912
+        volumes:
+          - ./broker.conf:/home/rocketmq/rocketmq-5.3.2/conf/broker.conf
+        environment:
+          - NAMESRV_ADDR=rmqnamesrv:9876
+        depends_on:
+          - namesrv
+        networks:
+          - rocketmq
+        command: sh mqbroker -c /home/rocketmq/rocketmq-5.3.2/conf/broker.conf
+
+    proxy:
+        image: apache/rocketmq:5.3.2
+        container_name: rmqproxy
+        networks:
+          - rocketmq
+        depends_on:
+          - broker
+          - namesrv
+        ports:
+          - 8080:8080
+          - 8082:8082
+        restart: on-failure
+        environment:
+          - NAMESRV_ADDR=rmqnamesrv:9876
+        command: sh mqproxy
+
+networks:
+    rocketmq:
+        driver: bridge
+
+volumes:
+  pgdata:

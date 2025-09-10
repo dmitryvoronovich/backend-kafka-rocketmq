@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
+
+    <changeSet id="insert-bets-1" author="poc">
+        <insert tableName="bets">
+            <column name="bet_id" valueNumeric="1"/>
+            <column name="user_id" value="user1"/>
+            <column name="event_id" value="E1"/>
+            <column name="event_market_id" value="M1"/>
+            <column name="event_winner_id" value="W1"/>
+            <column name="bet_amount" valueNumeric="102.00"/>
+        </insert>
+
+        <insert tableName="bets">
+            <column name="bet_id" valueNumeric="2"/>
+            <column name="user_id" value="user2"/>
+            <column name="event_id" value="E1"/>
+            <column name="event_market_id" value="M1"/>
+            <column name="event_winner_id" value="W1"/>
+            <column name="bet_amount" valueNumeric="53.50"/>
+        </insert>
+
+        <insert tableName="bets">
+            <column name="bet_id" valueNumeric="3"/>
+            <column name="user_id" value="user2"/>
+            <column name="event_id" value="E2"/>
+            <column name="event_market_id" value="M1"/>
+            <column name="event_winner_id" value="W2"/>
+            <column name="bet_amount" valueNumeric="27.50"/>
+        </insert>
+
+        <insert tableName="bets">
+            <column name="bet_id" valueNumeric="4"/>
+            <column name="user_id" value="user3"/>
+            <column name="event_id" value="E2"/>
+            <column name="event_market_id" value="M1"/>
+            <column name="event_winner_id" value="W3"/>
+            <column name="bet_amount" valueNumeric="15.75"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
