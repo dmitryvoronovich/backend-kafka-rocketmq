@@ -1,7 +1,6 @@
 plugins {
     id("java")
     id("org.springframework.boot") version "${springBootVersion}"
-    id("io.spring.dependency-management")
 }
 
 group = "org.poc"
@@ -9,7 +8,7 @@ version = "1.0-SNAPSHOT"
 
 dependencies {
     implementation(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
-    implementation project(':domain-common')
+    implementation(project(":domain-common"))
 
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")

@@ -1,19 +1,19 @@
 plugins {
-    id 'java'
+    id("java")
     id("io.spring.dependency-management")
 }
 
-group = 'org.poc'
-version = '1.0-SNAPSHOT'
+group = "org.poc"
+version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+    implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
 
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation(platform("org.junit:junit-bom:5.10.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
